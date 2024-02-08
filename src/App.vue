@@ -1,49 +1,78 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+<script>
+import SettingsComp from './components/SettingsComp.vue';
+import PagesComp from './components/PagesComp.vue';
+import CategoryComp from './components/CategoryComp.vue';
+import { store } from './components/store';
+import { webContents } from 'electron';
+import fs from 'fs';
+import { shell } from 'electron';
+// import { electron } from 'process';
+// electron.pd
+export default {
+  name: 'App',
+  components: {
+    SettingsComp,
+    PagesComp,
+    CategoryComp,
+  },
+  data() {
+    return {
+      overlay: false,
+      store,
+    };
+  },
+  methods: {
+    savePDFToStorage() {
+
+    }
+  }
+}
+
 </script>
 
-<template>
-  <div>
-    <a href="https://www.electronjs.org/" target="_blank">
-      <img src="./assets/electron.svg" class="logo electron" alt="Electron logo" />
-    </a>
-    <a href="https://vitejs.dev/" target="_blank">
-      <img src="./assets/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Electron + Vite + Vue" />
-  <div class="flex-center">
-    Place static files into the <code>/public</code> folder
-    <img style="width: 2.4em; margin-left: .4em;" src="/logo.svg" alt="Logo">
+<template >
+  <div class="container">
+    <div id="form">
+      <SettingsComp />
+    </div>
+    <div id="preview">
+      <PagesComp ref="catalog">
+          <CategoryComp v-for="(products, category) in store.products.getCategories()" :key="category"
+            :category="category" :products="products" />
+          <v-overlay :opacity="1" :value="overlay">
+            <v-progress-circular indeterminate size="64">
+              Loading...
+            </v-progress-circular>
+          </v-overlay>
+        </PagesComp>
+    </div>
   </div>
 </template>
 
 <style>
-.flex-center {
+* {
+  overflow: hidden;
+}
+body, #app {
+  /* scrollbar-color: #c5c5c5 #f5f5f5; */
+}
+.container {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* position: relative; */
+  /* height: 300px; */
+  max-height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+
+#form {
+  height: 100vh;
+  flex: 0 1 50vw;
+  overflow-y: auto;
 }
 
-.logo.electron:hover {
-  filter: drop-shadow(0 0 2em #9FEAF9);
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+#preview {
+  height: 100vh;
+  flex: 0 1 50vw;
+  overflow-y: auto;
 }
 </style>

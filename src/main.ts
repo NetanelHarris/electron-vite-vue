@@ -8,8 +8,8 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 const vuetify = createVuetify({
-  components,
-  directives,
+    components,
+    directives,
 })
 
 import './style.css'
@@ -19,8 +19,8 @@ import './demos/ipc'
 // import './demos/node'
 
 createApp(App)
-  .use(vuetify)
-  .mount('#app')
-  .$nextTick(() => {
-    postMessage({ payload: 'removeLoading' }, '*')
-  })
+    .use(vuetify)
+    .mount('#app')
+    .$nextTick(() => {
+        postMessage({ payload: 'removeLoading' }, '*')
+    })
