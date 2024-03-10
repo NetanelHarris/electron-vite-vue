@@ -10,16 +10,13 @@ function csvToJson(csv) {
         }
         result.push(obj);
     }
-    console.log(result);
     return result;
 }
 
 export function getCsvFile(file) {
-    console.log('getCsvFile()', file);
     // // Returns a csv file as a json object, not Promise
     // const reader = new FileReader();
     // reader.readAsText(file);
-    // console.log(reader.result);
     // reader.onload = function () {
     //     const csv = reader.result;
     //     const json = csvToJson(csv);

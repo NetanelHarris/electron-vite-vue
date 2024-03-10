@@ -94,3 +94,13 @@ code {
     background-color: #f9f9f9;
   }
 } */
+@import url('../node_modules/noto-fontface/css/noto-fontface.css');
+/* 
+@font-face {
+  font-family: 'Noto Sans HE';
+  src: url('noto-fontface/fonts/NotoSansHebrew/NotoSansHebrew-Bold.woff2') format('woff2');
+} */
+
+#app {
+  font-family: 'Noto Sans Hebrew', sans-serif;
+}

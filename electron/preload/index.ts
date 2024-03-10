@@ -67,11 +67,15 @@ function useLoading() {
 }
 .${className} > div {
   animation-fill-mode: both;
-  width: 50px;
-  height: 50px;
-  background: #fff;
-  animation: square-spin 3s 0s cubic-bezier(0.09, 0.57, 0.49, 0.9) infinite;
-}
+  width: 100px;
+  height: 100px;
+  /*background: #fff;*/
+/*   background: #61dafb; */
+  /*background-image: url('https://bstoys.co.il/wp-content/uploads/2020/11/logo_BS-1.png');*/
+  background-image: url('BS_Log_no_bg.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  animation: square-spin 3s 0s cubic-bezier(0.09, 0.57, 0.49, 0.9) infinite;}
 .app-loading-wrap {
   position: fixed;
   top: 0;
@@ -99,8 +103,15 @@ function useLoading() {
       safeDOM.append(document.body, oDiv)
     },
     removeLoading() {
-      safeDOM.remove(document.head, oStyle)
-      safeDOM.remove(document.body, oDiv)
+      // Fade out
+      oDiv.style.transition = 'opacity 0.5s'
+      oDiv.style.opacity = '0'
+      setTimeout(() => {
+        safeDOM.remove(document.head, oStyle)
+        safeDOM.remove(document.body, oDiv)
+      }, 499)
+      // safeDOM.remove(document.head, oStyle)
+      // safeDOM.remove(document.body, oDiv)
     },
   }
 }
@@ -114,4 +125,4 @@ window.onmessage = (ev) => {
   ev.data.payload === 'removeLoading' && removeLoading()
 }
 
-setTimeout(removeLoading, 4999)
+// setTimeout(removeLoading, 4999)

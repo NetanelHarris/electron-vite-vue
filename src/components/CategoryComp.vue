@@ -1,19 +1,23 @@
 <template>
-    <CategoryIndex :category="category" :products="products" />
-    <ProductComp v-for="product in products" :key="product.productId" :product="product"/>
+    <div>
+        <CategoryIndex :category="category" :products="data.catalog.getProductsByCategory(category)" />
+        <ProductComp v-for="product in data.catalog.getProductsByCategory(category)" :key="product.sku" :product="product"/>
+    </div>
 </template>
 <script>
 import CategoryIndex from './CategoryIndex.vue';
 import ProductComp from './ProductComp.vue';
+import { data } from './data.js';
 
 export default {
     name: 'CategoryComp',
     components: {
     CategoryIndex,
-    ProductComp
+    ProductComp,
 },
     data() {
         return {
+            data,
             defaultImage: 'https://via.placeholder.com/150',
         }
     
@@ -23,10 +27,8 @@ export default {
             type: String,
             required: true
         },
-        products: {
-            type: Array,
-            required: true
-        }
     },
+    mounted() {
+    }
 }
 </script>

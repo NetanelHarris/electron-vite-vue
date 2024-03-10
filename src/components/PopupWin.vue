@@ -1,68 +1,84 @@
 <template>
   <v-btn @click="openPortal()">Open</v-btn>
-    <div v-if="open">
-      <slot />
-    </div>
-  </template>
+  <div>
+    <slot />
+  </div>
+</template>
   
-  <script>
-  export default {
-    name: 'PopupWin',
-    props: {
-      open: {
-        type: Boolean,
-        default: false,
-      }
-    },
-    data() {
-      return {
-        windowRef: null,
-      }
-    },
-    watch: {
-      open(newOpen) {
-        if(newOpen) {
-          this.openPortal();
-        } else {
-          this.closePortal();
-        }
-      }
-    },
-    methods: {
-      openPortal() {
-        this.windowRef = window.open("", "", "width=1200,height=800,left=200,top=200");
-        this.windowRef.addEventListener('beforeunload', this.closePortal);
-        // magic!
-        this.windowRef.document.body.appendChild(this.$el);
-        // Get all stylesheets from the parent document
-        const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
-        // Append them to the popup's head
-        // Create head element and add styles
-        const head = this.windowRef.document.createElement('head');
-        styles.forEach((style) => {
-          head.appendChild(style.cloneNode(true));
-        });
-        this.windowRef.document.body.appendChild(head);
-        this.$emit('open');
-
-      },
-      closePortal() {
-        if(this.windowRef) {
-          this.windowRef.close();
-          this.windowRef = null;
-          this.$emit('close');
-        }
-      }
-    },
-    mounted() {
-      if(this.open) {
+<script>
+export default {
+  name: 'PopupWin',
+  props: {
+    open: {
+      type: Boolean,
+      default: false,
+    }
+  },
+  data() {
+    return {
+      windowRef: null,
+    }
+  },
+  watch: {
+    open(newOpen) {
+      if (newOpen) {
         this.openPortal();
-      }
-    },
-    beforeUnmount() {
-      if (this.windowRef) {
+      } else {
         this.closePortal();
       }
     }
+  },
+  methods: {
+    openPortal() {
+      // Get all html from the component
+      /**
+       * @type {HTMLElement}
+       */
+      const html = this.$el;
+      // Get all stylesheets from the parent document
+      const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+      // get html from styles
+      let stylesHtml = '';
+      styles.forEach((style) => {
+        if (style.tagName === 'STYLE') {
+          stylesHtml += style.outerHTML;
+        } else {
+          stylesHtml += `<link rel="stylesheet" href="${style.href}" />`;
+        }
+      });
+      // Add styles to the html
+      const finalHtml = `
+          <html>
+            <head>
+              ${stylesHtml}
+            </head>
+            <body>
+              ${html}
+            </body>
+          </html>
+        `;
+      ipcRenderer.invoke('open-window', finalHtml).then((result) => {
+      });
+
+
+    },
+    closePortal() {
+      if (this.windowRef) {
+        this.windowRef.close();
+        this.windowRef = null;
+        this.$emit('close');
+      }
+    }
+  },
+  mounted() {
+    if (this.open) {
+      this.openPortal();
+    }
+  },
+  beforeUnmount() {
+    if (this.windowRef) {
+      this.closePortal();
+    }
   }
-  </script>
+}
+</script>

@@ -2,6 +2,8 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { release } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { dialog } from 'electron'
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -57,6 +59,10 @@ async function createWindow() {
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       // contextIsolation: false,
     },
+    height: 785,
+    width: 1200,
+    minWidth: 1120,
+    minHeight: 785
   })
 
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
@@ -119,4 +125,61 @@ ipcMain.handle('open-win', (_, arg) => {
   } else {
     childWindow.loadFile(indexHtml, { hash: arg })
   }
+})
+
+// Print Window content
+ipcMain.handle('print', (_, arg) => {
+  console.log(arg.pageSizes)
+  // const fileName = dialog.showSaveDialogSync(
+  //   {
+  //     title: 'Save PDF',
+  //     defaultPath: `קטלוג ${new Date().toLocaleDateString()}.pdf`,
+  //     filters: [
+  //       { name: 'PDF', extensions: ['pdf'] }
+  //     ]
+  //   }
+  // ) as string
+  const fileName = arg.path
+  if (!fileName) {
+    return 'Canceled'
+  }
+  win?.webContents.printToPDF({
+    // preferCSSPageSize: true,
+    pageSize: arg.pageSizes,
+    // pageSize: {
+    //   width: 4,
+    //   height: 4
+    // },
+    // pageRanges: '1-10',
+    // Set mergin to 0
+    margins: {
+      marginType: 'custom',
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0
+    },
+    printBackground: true,
+    // scale: 1
+  }).then(data => {
+    fs.writeFile(fileName, data, () => {
+      console.log('Write PDF successfully.')
+    })
+  }
+  ).then(() => {
+    return 'Printed'
+  })
+})
+
+// Open save dialog
+ipcMain.handle('save-dialog', async (_, arg) => {
+  const result = await dialog.showSaveDialog({
+    title: 'Save file',
+    defaultPath: `קטלוג ${new Date().toLocaleDateString()}.pdf`,
+    filters: [
+      { name: 'PDF', extensions: ['pdf'] }
+    ]
+  })
+  if (result.canceled) return 'Canceled'
+  return result.filePath
 })

@@ -3,9 +3,8 @@
  */
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "AutoCatalog",
   "directories": {
     "output": "release/${version}"
   },
@@ -13,12 +12,12 @@
     "dist",
     "dist-electron"
   ],
-  "mac": {
-    "target": [
-      "dmg"
-    ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
-  },
+  // "mac": {
+  //   "target": [
+  //     "dmg"
+  //   ],
+  //   "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+  // },
   "win": {
     "target": [
       {
@@ -31,15 +30,15 @@
     "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
   },
   "nsis": {
-    "oneClick": false,
+    "oneClick": true,
     "perMachine": false,
-    "allowToChangeInstallationDirectory": true,
+    "allowToChangeInstallationDirectory": false,
     "deleteAppDataOnUninstall": false
-  },
-  "linux": {
-    "target": [
-      "AppImage"
-    ],
-    "artifactName": "${productName}-Linux-${version}.${ext}"
   }
+  // "linux": {
+  //   "target": [
+  //     "AppImage"
+  //   ],
+  //   "artifactName": "${productName}-Linux-${version}.${ext}"
+  // }
 }

@@ -2,77 +2,129 @@
 import SettingsComp from './components/SettingsComp.vue';
 import PagesComp from './components/PagesComp.vue';
 import CategoryComp from './components/CategoryComp.vue';
-import { store } from './components/store';
-import { webContents } from 'electron';
-import fs from 'fs';
-import { shell } from 'electron';
-// import { electron } from 'process';
-// electron.pd
+import WizardComp from './components/WizardComp.vue';
+import { store, Catalog } from './components/store';
+import CategoriesIndex from './components/CategoriesIndex.vue';
+import StartPage from './components/StartPage.vue';
+import { data } from './components/data.js';
+
 export default {
   name: 'App',
   components: {
     SettingsComp,
     PagesComp,
     CategoryComp,
+    CategoriesIndex,
+    StartPage,
+    WizardComp
   },
   data() {
     return {
-      overlay: false,
-      store,
+      overlay: true,
+      isEditable: true,
+      data,
     };
   },
   methods: {
+    createCatalog() {
+      store.catalog = new Catalog();
+      store.catalog.importProducts(store.dataTable[0]);
+    },
     savePDFToStorage() {
-
-    }
+      // document.querySelector('#form').remove();
+      let message = {
+        pageSizes: this.getPageSizes()
+      }
+      ipcRenderer.invoke('print', message).then((result) => {
+      });
+    },
+    getPageSizes() {
+      const height = Number(getComputedStyle(document.querySelector('.product')).height.replace('px', '')) / 100;
+      const width = Number(getComputedStyle(document.querySelector('.product')).width.replace('px', '')) / 100;
+      return { height, width };
+    },
+  },
+  mounted() {
+    setTimeout(() => {
+      postMessage({ payload: 'removeLoading' }, '*')
+    }, 500);
   }
 }
 
 </script>
 
 <template >
-  <div class="container">
+  <div class="main-container">
     <div id="form">
-      <SettingsComp />
+      <v-container>
+        <WizardComp />
+      </v-container>
     </div>
-    <div id="preview">
-      <PagesComp ref="catalog">
-          <CategoryComp v-for="(products, category) in store.products.getCategories()" :key="category"
-            :category="category" :products="products" />
-          <v-overlay :opacity="1" :value="overlay">
-            <v-progress-circular indeterminate size="64">
-              Loading...
-            </v-progress-circular>
-          </v-overlay>
-        </PagesComp>
+    <v-divider vertical />
+    <div id="preview" class="">
+      <PagesComp ref="window">
+        <StartPage />
+        <CategoriesIndex id="categories" v-show="data.catalog.categories" :categoryes="data.catalog.categories" />
+        <CategoryComp v-for="category in data.catalog.categories" :key="category"
+          :category="category" />
+      </PagesComp>
     </div>
   </div>
 </template>
-
 <style>
-* {
-  overflow: hidden;
-}
-body, #app {
-  /* scrollbar-color: #c5c5c5 #f5f5f5; */
-}
-.container {
+.main-container {
   display: flex;
   /* position: relative; */
   /* height: 300px; */
+  height: 100vh;
+  width: 100vw;
   max-height: 100vh;
 }
-
 
 #form {
   height: 100vh;
   flex: 0 1 50vw;
   overflow-y: auto;
+  max-width: 600px;
+  min-width: 500px;
+}
+
+html {
+  overflow-y: hidden !important;
 }
 
 #preview {
+  display: flex;
   height: 100vh;
-  flex: 0 1 50vw;
+  flex: 0 1 100vw;
   overflow-y: auto;
+  min-width: 0;
+}
+
+@media print {
+  .catalog {
+    grid-row-gap: 0;
+  }
+
+  .main-container > .v-divider,
+  #form,
+  #form * {
+    display: none;
+    position: absolute;
+    height: 0;
+    width: 0;
+  }
+
+
+  .v-row,
+  .v-container,
+  .main-container,
+  body,
+  #form,
+  #app,
+  #preview {
+    display: initial;
+    width: fit-content !important;
+  }
 }
 </style>
